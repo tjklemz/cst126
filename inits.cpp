@@ -1,12 +1,40 @@
 #include <iostream>
+#include <cstring>
 
-int main() {
-  int * num = new int[5]{};
+void append(char **& arr, int n, const char * item) {
+  char ** newArr = new char * [n + 1];
+  for (int i = 0; i < n; ++i) {
+    newArr[i] = arr[i];
+  }
+  char * newItem = new char[strlen(item) + 1];
+  strcpy(newItem, item);
+  newArr[n] = newItem;
 
-  for (int i = 0; i < 5; ++i) {
-    std::cout << num[i] << std::endl;
+  delete[] arr;
+  arr = newArr;
+}
+
+void deleteAll(char **& arr, int &n) {
+  for (int i = 0; i < n; ++i) {
+    delete[] arr[i];
   }
 
-  delete[] num;
-  return 0;
+  delete[] arr;
+  arr = nullptr;
+  n = 0;
+}
+
+int main() {
+  int n = 0;
+  char ** lines{};
+
+  append(lines, n++, "bob");
+  append(lines, n++, "hello world");
+  append(lines, n++, "yo yo yo");
+
+  for (int i = 0; i < n; ++i) {
+    std::cout << lines[i] << '\n';
+  }
+
+  deleteAll(lines, n);
 }
