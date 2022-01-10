@@ -7,7 +7,7 @@ void append(char **& arr, int n, const char * item) {
     newArr[i] = arr[i];
   }
   char * newItem = new char[strlen(item) + 1];
-  strcpy(newItem, item);
+  std::strcpy(newItem, item);
   newArr[n] = newItem;
 
   delete[] arr;
@@ -25,7 +25,7 @@ void deleteAll(char **& arr, int &n) {
 }
 
 int main() {
-  int n = 0;
+  int n{};
   char ** lines{};
 
   append(lines, n++, "bob");
