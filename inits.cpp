@@ -2,11 +2,11 @@
 #include <cstring>
 
 void append(char **& arr, int n, const char * item) {
-  char ** newArr = new char * [n + 1];
-  for (int i = 0; i < n; ++i) {
+  char ** newArr = new char * [n + 1]{};
+  for (int i{}; i < n; ++i) {
     newArr[i] = arr[i];
   }
-  char * newItem = new char[strlen(item) + 1];
+  char * newItem = new char[strlen(item) + 1]{};
   std::strcpy(newItem, item);
   newArr[n] = newItem;
 
@@ -15,7 +15,7 @@ void append(char **& arr, int n, const char * item) {
 }
 
 void deleteAll(char **& arr, int &n) {
-  for (int i = 0; i < n; ++i) {
+  for (int i{}; i < n; ++i) {
     delete[] arr[i];
   }
 
@@ -32,7 +32,7 @@ int main() {
   append(lines, n++, "hello world");
   append(lines, n++, "yo yo yo");
 
-  for (int i = 0; i < n; ++i) {
+  for (int i{}; i < n; ++i) {
     std::cout << lines[i] << '\n';
   }
 

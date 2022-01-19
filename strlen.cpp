@@ -1,8 +1,8 @@
 #include <iostream>
 
-int strlen(char * str) {
+int strlen(char * s) {
   int i{};
-  while (str[i++]);
+  while (s[i++]);
   return i-1;
 }
 

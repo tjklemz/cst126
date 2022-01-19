@@ -1,7 +1,7 @@
 #include <iostream>
 
 void forEach(const char * strs[], int n, void (*fn)(const char *)) {
-  for (int i = 0; i < n; ++i) {
+  for (int i{}; i < n; ++i) {
     fn(strs[i]);
   }
 }
