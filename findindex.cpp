@@ -18,10 +18,14 @@ int main() {
   const char * item = "frank";
 
   const char * strs[]{"bob", "frank", "sally"};
-
-  auto index = findIndex(strs, 3, [&item](auto current) {
+  auto myLambda = [&item](auto current) {
     return std::strcmp(current, item) == 0;
-  });
+  };
 
+  auto index = findIndex(strs, 3, myLambda);
   std::cout << "index: " << index << '\n';
+
+  for (auto item : strs) {
+    std::cout << item << '\n';
+  }
 }

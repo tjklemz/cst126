@@ -1,43 +1,68 @@
 #include <iostream>
+#include <cstddef>
+using std::size_t;
 
-template <typename T>
-void append(T *& items, int n, T item) {
+template <typename T, typename F>
+void append(T *& items, size_t n, F createItem) {
   T * newItems = new T[n + 1]{};
-  for (int i{}; i < n; ++i) {
+  for (size_t i{}; i < n; ++i) {
     newItems[i] = items[i];
   }
-  newItems[n] = item;
+
+  newItems[n] = createItem();
 
   delete[] items;
   items = newItems;
 }
 
 template <typename T, typename F>
-void forEach(T items[], int n, F fn) {
-  for (int i{}; i < n; ++i) {
+void forEach(T items[], size_t n, F fn) {
+  for (size_t i{}; i < n; ++i) {
     fn(items[i]);
   }
 }
+
+char * copy(const char * s) {
+  char * newItem = new char[std::strlen(s) + 1]{};
+  std::strcpy(newItem, s);
+  return newItem;
+}
+
+auto id = [](auto x) {
+  return [=]() { return x; };
+};
 
 int main() {
   // create a lambda that we'll reuse down below
   auto print = [](auto item) { std::cout << item << '\n'; };
 
+  auto get1 = id(1);
+  print(get1());
+  print(id(1)());
+
   // let's append ints...
   int * nums{};
-  int n{};
+  size_t n{};
 
-  append(nums, n++, 1);
+  append(nums, n++, id(1));
   forEach(nums, n, print);
 
   delete[] nums; // append called "new" so we need to delete
 
-  // let's append floats. it should work the same way:
-  float * fs{};
-  int fN{};
+  char ** strs{};
+  size_t numStrs{};
 
-  append(fs, fN++, 0.5f);
-  forEach(fs, fN, print);
+  // calls copy immediately
+  append(strs, numStrs++, id(copy("bob")));
+  // or, slightly different way, where copy gets called later instead of immediately:
+  append(strs, numStrs++, []() {
+    return copy("sally");
+  });
 
-  delete[] fs; // append called "new" so we need to delete
+  forEach(strs, numStrs, print);
+
+  for (size_t i{}; i < numStrs; ++i) {
+    delete[] strs[i];
+  }
+  delete[] strs;
 }
