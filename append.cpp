@@ -1,9 +1,10 @@
+#include <type_traits>
 #include <iostream>
 #include <cstddef>
 using std::size_t;
 
 template <typename T, typename F>
-void append(T *& items, size_t n, F createItem) {
+void append(T *& items, size_t & n, F createItem) {
   T * newItems = new T[n + 1]{};
   for (size_t i{}; i < n; ++i) {
     newItems[i] = items[i];
@@ -13,6 +14,7 @@ void append(T *& items, size_t n, F createItem) {
 
   delete[] items;
   items = newItems;
+  ++n;
 }
 
 template <typename T, typename F>
@@ -20,6 +22,18 @@ void forEach(T items[], size_t n, F fn) {
   for (size_t i{}; i < n; ++i) {
     fn(items[i]);
   }
+}
+
+template <typename T>
+void deleteAll(T *& items, size_t & n) {
+  if constexpr (std::is_pointer_v<T>) {
+    for (size_t i{}; i < n; ++i) {
+      delete[] items[i];
+    }
+  }
+  delete[] items;
+  items = nullptr;
+  n = 0;
 }
 
 char * copy(const char * s) {
@@ -44,25 +58,22 @@ int main() {
   int * nums{};
   size_t n{};
 
-  append(nums, n++, id(1));
+  append(nums, n, id(1));
   forEach(nums, n, print);
 
-  delete[] nums; // append called "new" so we need to delete
+  deleteAll(nums, n);
 
   char ** strs{};
   size_t numStrs{};
 
   // calls copy immediately
-  append(strs, numStrs++, id(copy("bob")));
+  append(strs, numStrs, id(copy("bob")));
   // or, slightly different way, where copy gets called later instead of immediately:
-  append(strs, numStrs++, []() {
+  append(strs, numStrs, []() {
     return copy("sally");
   });
 
   forEach(strs, numStrs, print);
 
-  for (size_t i{}; i < numStrs; ++i) {
-    delete[] strs[i];
-  }
-  delete[] strs;
+  deleteAll(strs, numStrs);
 }
