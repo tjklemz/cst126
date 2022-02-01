@@ -12,7 +12,7 @@ int findIndex(char ** items, int n, const char * item) {
 }
 
 bool exists(char ** items, int n, const char * item) {
-  return findIndex(items, n, item) >= 0;
+  return findIndex(items, n, item) != -1;
 }
 
 void append(char **& items, int n, const char * item) {
@@ -51,7 +51,7 @@ int main() {
 
   while (f.getline(buffer, 255)) {
     int index = findIndex(words, n, buffer);
-    if (index < 0) {
+    if (index == -1) {
       append(words, n, buffer);
       append(nums, n, 1);
       ++n;

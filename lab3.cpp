@@ -98,7 +98,7 @@ int main() {
     return !std::strcmp(tweet->creator, userToFind);
   });
 
-  if (index >= 0) {
+  if (index != -1) {
     Tweet * tweet = tweets[index];
     std::cout << tweet->creator << ": " << tweet->text << '\n';
   } else {
