@@ -3,37 +3,50 @@
 #include <cstddef>
 using std::size_t;
 
+template <typename T>
+struct Vector {
+  T * items;
+  size_t length;
+};
+
 template <typename T, typename F>
-void append(T *& items, size_t & n, F createItem) {
-  T * newItems = new T[n + 1]{};
-  for (size_t i{}; i < n; ++i) {
-    newItems[i] = items[i];
+void append(Vector<T> & v, F createItem) {
+  T * newItems = new T[v.length + 1]{};
+  for (size_t i{}; i < v.length; ++i) {
+    newItems[i] = v.items[i];
   }
 
-  newItems[n] = createItem();
+  newItems[v.length] = createItem();
 
-  delete[] items;
-  items = newItems;
-  ++n;
+  delete[] v.items;
+  v.items = newItems;
+  ++v.length;
 }
 
 template <typename T, typename F>
-void forEach(T items[], size_t n, F fn) {
-  for (size_t i{}; i < n; ++i) {
-    fn(items[i]);
+void forEach(const Vector<T> & v, F fn) {
+  for (size_t i{}; i < v.length; ++i) {
+    fn(v.items[i]);
+  }
+}
+
+template <typename T, typename F>
+void transform(Vector<T> & v, F fn) {
+  for (size_t i{}; i < v.length; ++i) {
+    v.items[i] = fn(v.items[i]);
   }
 }
 
 template <typename T>
-void deleteAll(T *& items, size_t & n) {
+void deleteAll(Vector<T> & v) {
   if constexpr (std::is_pointer_v<T>) {
-    for (size_t i{}; i < n; ++i) {
-      delete[] items[i];
+    for (size_t i{}; i < v.length; ++i) {
+      delete[] v.items[i];
     }
   }
-  delete[] items;
-  items = nullptr;
-  n = 0;
+  delete[] v.items;
+  v.items = nullptr;
+  v.length = 0;
 }
 
 char * copy(const char * s) {
@@ -47,33 +60,18 @@ auto id = [](auto x) {
 };
 
 int main() {
-  // create a lambda that we'll reuse down below
-  auto print = [](auto item) { std::cout << item << '\n'; };
+  Vector<int> v{};
 
-  auto get1 = id(1);
-  print(get1());
-  print(id(1)());
+  append(v, id(42));
+  append(v, id(36));
 
-  // let's append ints...
-  int * nums{};
-  size_t n{};
-
-  append(nums, n, id(1));
-  forEach(nums, n, print);
-
-  deleteAll(nums, n);
-
-  char ** strs{};
-  size_t numStrs{};
-
-  // calls copy immediately
-  append(strs, numStrs, id(copy("bob")));
-  // or, slightly different way, where copy gets called later instead of immediately:
-  append(strs, numStrs, []() {
-    return copy("sally");
+  transform(v, [](auto item) {
+    return item * 2;
   });
 
-  forEach(strs, numStrs, print);
+  forEach(v, [](auto item) {
+    std::cout << item << '\n';
+  });
 
-  deleteAll(strs, numStrs);
+  deleteAll(v);
 }
