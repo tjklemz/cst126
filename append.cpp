@@ -1,6 +1,8 @@
 #include <type_traits>
 #include <iostream>
 #include <cstddef>
+#include "string.hpp"
+
 using std::size_t;
 
 template <typename T>
@@ -9,14 +11,14 @@ struct Vector {
   size_t length;
 };
 
-template <typename T, typename F>
-void append(Vector<T> & v, F createItem) {
+template <typename T>
+void append(Vector<T> & v, T item) {
   T * newItems = new T[v.length + 1]{};
   for (size_t i{}; i < v.length; ++i) {
     newItems[i] = v.items[i];
   }
 
-  newItems[v.length] = createItem();
+  newItems[v.length] = item;
 
   delete[] v.items;
   v.items = newItems;
@@ -39,20 +41,9 @@ void transform(Vector<T> & v, F fn) {
 
 template <typename T>
 void deleteAll(Vector<T> & v) {
-  if constexpr (std::is_pointer_v<T>) {
-    for (size_t i{}; i < v.length; ++i) {
-      delete[] v.items[i];
-    }
-  }
   delete[] v.items;
   v.items = nullptr;
   v.length = 0;
-}
-
-char * copy(const char * s) {
-  char * newItem = new char[std::strlen(s) + 1]{};
-  std::strcpy(newItem, s);
-  return newItem;
 }
 
 auto id = [](auto x) {
@@ -60,14 +51,10 @@ auto id = [](auto x) {
 };
 
 int main() {
-  Vector<int> v{};
+  Vector<String> v{};
 
-  append(v, id(42));
-  append(v, id(36));
-
-  transform(v, [](auto item) {
-    return item * 2;
-  });
+  append(v, String{"bob"});
+  append(v, String{"sally"});
 
   forEach(v, [](auto item) {
     std::cout << item << '\n';
