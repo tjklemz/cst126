@@ -37,7 +37,7 @@ struct String {
     delete[] this->s;
   }
 
-  operator const char * () {
+  operator const char * () const {
     return this->s;
   }
 };

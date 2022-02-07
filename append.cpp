@@ -39,6 +39,15 @@ void transform(Vector<T> & v, F fn) {
   }
 }
 
+template <typename T, typename F>
+Vector<T> map(const Vector<T> & v, F fn) {
+  Vector<T> newVector{};
+  forEach(v, [&](const T & item) {
+    append(newVector, fn(item));
+  });
+  return newVector;
+}
+
 template <typename T>
 void deleteAll(Vector<T> & v) {
   delete[] v.items;
@@ -56,9 +65,24 @@ int main() {
   append(v, String{"bob"});
   append(v, String{"sally"});
 
-  forEach(v, [](auto item) {
+  auto print = [](const auto & item) {
     std::cout << item << '\n';
-  });
+  };
+
+  forEach(v, print);
+
+  auto capitalize = [](const String & str) {
+    String newStr{str};
+    newStr.s[0] += 'A' - 'a';
+    return newStr;
+  };
+
+  Vector<String> newVector = map(v, capitalize);
+
+  std::cout << '\n';
+
+  forEach(newVector, print);
 
   deleteAll(v);
+  deleteAll(newVector);
 }
