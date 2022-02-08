@@ -11,14 +11,14 @@ struct Vector {
   size_t length;
 };
 
-template <typename T>
-void append(Vector<T> & v, T item) {
+template <typename T, typename K>
+void append(Vector<T> & v, const K & item) {
   T * newItems = new T[v.length + 1]{};
   for (size_t i{}; i < v.length; ++i) {
     newItems[i] = v.items[i];
   }
 
-  newItems[v.length] = item;
+  newItems[v.length] = T{item};
 
   delete[] v.items;
   v.items = newItems;
@@ -40,8 +40,10 @@ void transform(Vector<T> & v, F fn) {
 }
 
 template <typename T, typename F>
-Vector<T> map(const Vector<T> & v, F fn) {
-  Vector<T> newVector{};
+auto map(const Vector<T> & v, F fn) {
+  using K = std::invoke_result_t<F, T>;
+
+  Vector<K> newVector{};
   forEach(v, [&](const T & item) {
     append(newVector, fn(item));
   });
@@ -55,14 +57,10 @@ void deleteAll(Vector<T> & v) {
   v.length = 0;
 }
 
-auto id = [](auto x) {
-  return [=]() { return x; };
-};
-
 int main() {
   Vector<String> v{};
 
-  append(v, String{"bob"});
+  append(v, "bob");
   append(v, String{"sally"});
 
   auto print = [](const auto & item) {
@@ -77,7 +75,9 @@ int main() {
     return newStr;
   };
 
-  Vector<String> newVector = map(v, capitalize);
+  auto newVector = map(v, [](const String & item) {
+    return std::strlen(item);
+  });
 
   std::cout << '\n';
 

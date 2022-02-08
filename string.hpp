@@ -7,9 +7,7 @@ struct String {
   char * s{};
   int n{};
 
-  String() : String("") {}
-
-  String(const char * cstr) {
+  String(const char * cstr = "") {
     this->n = std::strlen(cstr);
     this->s = new char[n + 1]{};
     std::strcpy(this->s, cstr);
