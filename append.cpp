@@ -7,8 +7,8 @@ using std::size_t;
 
 template <typename T>
 struct Vector {
-  T * items;
-  size_t length;
+  T * items{};
+  size_t length{};
 };
 
 template <typename T, typename K>
@@ -50,6 +50,17 @@ auto map(const Vector<T> & v, F fn) {
   return newVector;
 }
 
+template <typename T, typename F>
+auto filter(const Vector<T> & v, F fn) {
+  Vector<T> filtered{};
+  forEach(v, [&](const T & item) {
+    if (fn(item)) {
+      append(filtered, item);
+    }
+  });
+  return filtered;
+}
+
 template <typename T>
 void deleteAll(Vector<T> & v) {
   delete[] v.items;
@@ -62,12 +73,11 @@ int main() {
 
   append(v, "bob");
   append(v, String{"sally"});
+  append(v, "boss");
 
   auto print = [](const auto & item) {
     std::cout << item << '\n';
   };
-
-  forEach(v, print);
 
   auto capitalize = [](const String & str) {
     String newStr{str};
@@ -75,14 +85,14 @@ int main() {
     return newStr;
   };
 
-  auto newVector = map(v, [](const String & item) {
-    return std::strlen(item);
-  });
-
-  std::cout << '\n';
-
-  forEach(newVector, print);
+  auto startsWithB = [](const auto & item) {
+    return item.s[0] == 'b';
+  };
+  auto v2 = filter(v, startsWithB);
+  auto v3 = map(v2, capitalize);
+  forEach(v3, print);
 
   deleteAll(v);
-  deleteAll(newVector);
+  deleteAll(v2);
+  deleteAll(v3);
 }
