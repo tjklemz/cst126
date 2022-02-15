@@ -31,6 +31,14 @@ struct String {
     return *this;
   }
 
+  bool operator==(const char * other) const {
+    return !std::strcmp(this->s, other);
+  }
+
+  bool operator==(const String & other) const {
+    return this->operator==(other.s);
+  }
+
   ~String() {
     delete[] this->s;
   }
