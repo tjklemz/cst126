@@ -21,7 +21,7 @@ void append(vector<T> & v, const K & item) {
 }
 
 template <typename T, typename F>
-void forEach(vector<T> v, F fn) {
+void forEach(const vector<T> & v, F fn) {
   for (size_t i{}; i < v.size(); ++i) {
     fn(v[i]);
   }
@@ -30,6 +30,7 @@ void forEach(vector<T> v, F fn) {
 template <typename T, typename F>
 auto map(const vector<T> & v, F fn) {
   using K = std::invoke_result_t<F, T>;
+
   vector<K> l{};
   forEach(v, [&](const auto & item) {
     append(l, fn(item));
@@ -74,28 +75,56 @@ auto uniq(const vector<T> & v) {
   return l;
 }
 
-int main() {
-  vector<Tweet> tweets{};
+auto readLines(const char * filename) {
+  vector<string> lines{};
 
-  std::ifstream f{"tweets.txt"};
+  std::ifstream f{filename};
   char buffer[256]{};
   while (f.getline(buffer, 255)) {
-    char handle[16]{};
-    char text[141]{};
-    std::sscanf(buffer, "%s %[^\n]", handle, text);
-    Tweet tweet{handle, text};
-    append(tweets, tweet);
+    append(lines, buffer);
   }
+  return lines;
+}
+
+auto createTweet(const string & s) {
+  char handle[16]{};
+  char text[141]{};
+  std::sscanf(s.c_str(), "%s %[^\n]", handle, text);
+  return Tweet{handle, text};
+}
+
+auto createUser(const string & name) {
+  return User{name};
+}
+
+template <typename T>
+void print(const T & item) {
+  std::cout << item << '\n';
+}
+
+void print(const User & user) {
+  std::cout << user.handle << '\n';
+}
+
+void print(const Tweet & tweet) {
+  std::cout << tweet.creator << ": " << tweet.text << '\n';
+}
+
+template <typename T>
+void print(const vector<T> & items) {
+  forEach(items, [](const T & item) {
+    print(item);
+  });
+}
+
+int main() {
+  auto tweets = map(readLines("tweets.txt"), createTweet);
 
   auto names = uniq(map(tweets, [](const auto & tweet) {
     return tweet.creator;
   }));
 
-  auto users = map(names, [](const auto & name) {
-    return User{name};
-  });
+  auto users = map(names, createUser);
 
-  forEach(users, [](const auto & user) {
-    std::cout << user.handle << '\n';
-  });
+  print(users);
 }
