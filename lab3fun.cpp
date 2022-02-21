@@ -8,6 +8,7 @@ using std::vector;
 
 struct User {
   string handle;
+  vector<string> following;
 };
 
 struct Tweet {
@@ -38,10 +39,10 @@ auto map(const vector<T> & v, F fn) {
   return l;
 }
 
-template <typename T, typename K>
-size_t findIndex(const vector<T> & v, const K & item) {
+template <typename T, typename F>
+size_t findIndex(const vector<T> & v, F fn) {
   for (size_t i{}; i < v.size(); ++i) {
-    if (v[i] == item) {
+    if (fn(v[i])) {
       return i;
     }
   }
@@ -50,7 +51,10 @@ size_t findIndex(const vector<T> & v, const K & item) {
 
 template <typename T, typename K>
 bool includes(const vector<T> & v, const K & item) {
-  return findIndex(v, item) != -1;
+  auto index = findIndex(v, [&](const auto & v_item) {
+    return v_item == item;
+  });
+  return index != -1;
 }
 
 template <typename T, typename F>
@@ -126,5 +130,25 @@ int main() {
 
   auto users = map(names, createUser);
 
-  print(users);
+  // "login"
+  auto currentUserIndex = findIndex(users, [](const auto & user) {
+    return user.handle == "@sally";
+  });
+  auto currentUser = users[currentUserIndex];
+
+  // Case 1:  Following a user
+  append(currentUser.following, "@bob");
+  append(currentUser.following, "@ceo");
+  append(currentUser.following, "@guy");
+
+  // Case 2:  Unfollowing a user
+  currentUser.following = filter(currentUser.following, [](const auto & name) {
+    return name != "@bob";
+  });
+
+  // Case 5: View followers (feed)
+  auto feed = filter(tweets, [&](const auto & tweet) {
+    return includes(currentUser.following, tweet.creator);
+  });
+  print(feed);
 }
