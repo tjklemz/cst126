@@ -14,6 +14,10 @@ struct User {
 struct Tweet {
   string creator;
   string text;
+
+  bool operator==(const Tweet & other) const {
+    return creator == other.creator && text == other.text;
+  }
 };
 
 template <typename T, typename K>
@@ -121,6 +125,20 @@ void print(const vector<T> & items) {
   });
 }
 
+template <typename T>
+auto concat(const vector<T> & a, const vector<T> & b) {
+  auto c{a};
+  forEach(b, [&](const auto & item) {
+    append(c, item);
+  });
+  return c;
+}
+
+template <typename T>
+auto set_union(const vector<T> & a, const vector<T> & b) {
+  return uniq(concat(a, b));
+}
+
 int main() {
   auto tweets = map(readLines("tweets.txt"), createTweet);
 
@@ -132,19 +150,38 @@ int main() {
 
   // "login"
   auto currentUserIndex = findIndex(users, [](const auto & user) {
-    return user.handle == "@sally";
+    return user.handle == "@guy";
   });
   auto currentUser = users[currentUserIndex];
 
   // Case 1:  Following a user
   append(currentUser.following, "@bob");
-  append(currentUser.following, "@ceo");
-  append(currentUser.following, "@guy");
+  append(currentUser.following, "@joe");
+  append(currentUser.following, "@sally");
 
   // Case 2:  Unfollowing a user
   currentUser.following = filter(currentUser.following, [](const auto & name) {
     return name != "@bob";
   });
+
+  std::cout << "View your own tweets" << '\n';
+
+  // Case 3:  View your own tweets
+  auto myTweets = filter(tweets, [&](const auto & tweet) {
+    return tweet.creator == currentUser.handle;
+  });
+  print(myTweets);
+
+  std::cout << "\nView your own tweets + mentions" << '\n';
+
+  // Case 4:  View your own tweets + mentions
+  auto mentions = filter(tweets, [&](const auto & tweet) {
+    return tweet.text.find(currentUser.handle) != -1;
+  });
+  auto tweetsAndMentions = set_union(myTweets, mentions);
+  print(tweetsAndMentions);
+
+  std::cout << "\nView feed" << '\n';
 
   // Case 5: View followers (feed)
   auto feed = filter(tweets, [&](const auto & tweet) {
