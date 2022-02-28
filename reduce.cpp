@@ -42,4 +42,12 @@ int main() {
   for (const auto & [key, value] : items) {
     std::cout << key << ": " << value << '\n';
   }
+
+  vector<int> nums{13, 24, 3, 0, 21};
+
+  auto sum = reduce(nums, [](int acc, int n) {
+    return acc + n;
+  }, 0);
+
+  std::cout << sum << '\n';
 }
