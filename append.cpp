@@ -9,6 +9,10 @@ template <typename T>
 struct Vector {
   T * items{};
   size_t length{};
+
+  // keep in mind the "Rule of Three" is missing
+  // so there is not yet proper memory management
+  // (you have to build that)
 };
 
 template <typename T, typename K>
